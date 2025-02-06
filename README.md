@@ -10,12 +10,9 @@
   
 <!-- Badges -->   
 <h4>
+  <span> · </span>
     <a href="https://www.youtube.com/watch?v=D8d8B8WtxgM">View Demo</a>
   <span> · </span>
-    <a href="https://elanguages.site/esolang/swagger/index.html">Swagger</a>
-  <span> · </span>
-    <a href="https://elanguages.site/home">Web app</a>
-
 </div>
 
 <br />
