@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)https://w3c.github.io/scholarly-html/ -->
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>Scholarly HTML</title>
+    <link rel="stylesheet" href="./Scholarly HTML_files/scholarly.min.css" />
+    <script src="./Scholarly HTML_files/scholarly.min.js.download"></script>
+  </head>
+  <body prefix="schema:  http://schema.org">
+    <header>
+      <div class="banner">
+        <img
+          src="./Scholarly HTML_files/scholarly-html.svg"
+          width="227"
+          height="50"
+          alt="Scholarly HTML logo"
+        />
+        <div class="status">Community Draft</div>
+      </div>
+      <h1>ELAN</h1>
+    </header>
+    <!--
+      XXX
+      - check refs
+      - the math example has too much maths
+      - bring back some of the old style
+      - make semantics, validation, processing sub-sections of each structural element
+      - have a section before that for general constructs
+        - explain why use RDFa
+        - explain our patterns: RDFa, roles
+      - figure captions need to get set throughout
+      - dedication? see doc-dedication
+      - syntactic constraints (prefix)
+      - needs more sthenurines
+      - examples of everything
+      - some notes on using Semantic CSS
+      - needs more RDFa in the spec itself
+    -->
+    <div role="contentinfo">
+      <dl>
+        <dt>Authors</dt>
+        <dd>
+          <a href="https://github.com/MEinfo724">Marcu Eduard</a>
+        </dd>
+      </dl>
+    </div>
+    <section typeof="sa:Abstract" id="abstract" role="doc-abstract">
+      <h2>Abstract</h2>
+      <p>
+        This document represents the technical sheet of the ELAN project,
+        created Marcu Eduard for the Web Application Development (MSc studies)
+        course.
+      </p>
+    </section>
+    <section id="introduction" role="doc-introduction">
+      <!-- review? -->
+      <h2>Introduction</h2>
+      <p>
+        ELAN (Esoteric Language Analysis Network) is a web platform for
+        exploring and analyzing esoteric programming languages (esolangs). It
+        provides a centralized hub for information, resources, and tools,
+        leveraging a conceptual model (ontology/thesaurus) built from existing
+        esolang lists like Wikidata.
+      </p>
+      <p>
+        The project offers a SPARQL endpoint for querying the knowledge base,
+        enabling detailed information retrieval about esolangs, their features,
+        tools, and applications. The platform also recommends esolangs based on
+        user preferences, language categories, and pragmatic use cases. ELAN
+        aims to make esolangs more accessible for learning, programming,
+        research, and general discovery.
+      </p>
+      <p>
+        The web app can be found here:
+        <a href="https://elanguages.site/home" target="_blank">ELAN</a>.
+      </p>
+      <p>
+        The demo for the web app can be found here:
+        <a href="https://www.youtube.com/watch?v=D8d8B8WtxgM" target="_blank"
+          >ELAN</a
+        >.
+      </p>
+      <p>
+        The GitHub repository for the web app can be found here:
+        <a href="https://github.com/elanguages/ELAN" target="_blank">ELAN</a>.
+      </p>
+      <img src="./Scholarly HTML_files/first.png" width="600px" />
+    </section>
+    <section id="structure">
+      <!-- review? -->
+      <h2>Structure</h2>
+      <p></p>
+      <section id="Root">
+        <!-- review? -->
+        <h3>Tech Stack</h3>
+        <p>
+          ELAN is a web application made with TypeScript, React, Chakra UI, .Net
+          Core 8, Azure services, e.g, DNS Zone, Container Registry and
+          Kubernetes Service.
+        </p>
+      </section>
+      <section id="article">
+        <!-- review? -->
+        <h3>Work Flow</h3>
+        <img src="./Scholarly HTML_files/second.drawio.png" width="800px" />
+        <p>
+          The diagram represents the architecture of the ELAN Web Application,
+          which is hosted on Microsoft Azure and deployed using Azure Kubernetes
+          Service (AKS). Below is an analysis of how the system works:
+        </p>
+        <section id="user-access-flow">
+          <h4>User Access Flow</h4>
+          <ul>
+            <li>
+              A User/Client accesses the web application via HTTPS by visiting
+              elanguages.site.
+            </li>
+            <li>
+              The request is resolved through Azure DNS Zone and directed to an
+              AKS Load Balancer.
+            </li>
+            <li>
+              The Load Balancer routes the request to the Ingress Controller,
+              which manages incoming traffic and directs it to the appropriate
+              service within the Azure AKS Cluster.
+            </li>
+          </ul>
+        </section>
+        <section id="web-app-comp">
+          <h5>Web Application Components (Inside the AKS Cluster)</h5>
+          <ul>
+            <li>
+              The Ingress Controller determines where to send requests based on
+              the URL path.
+            </li>
+            <li>
+              Requests are routed to different services depending on the
+              endpoint:
+              <ul>
+                <li>/esolang → elan-esolang-api-deployment</li>
+                <li>/elan → elan-api-deployment</li>
+                <li>/ (root) → elan-site-deployment</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+        <section id="container-image-managment">
+          <h5>Container Image Management</h5>
+          <ul>
+            <li>
+              The application components (APIs, frontend, etc.) pull their
+              container images from Azure Container Registry (elanacr).
+            </li>
+            <li>
+              This ensures that deployments are scalable and can be updated
+              easily by pushing new images to the registry.
+            </li>
+          </ul>
+        </section>
+        <section id="security">
+          <h5>Security & Certificate Management</h5>
+          <ul>
+            <li>
+              The system uses Cert Manager to handle SSL/TLS certificates.
+            </li>
+            <li>
+              Certificates are issued and managed via Let's Encrypt API,
+              ensuring secure HTTPS communication.
+            </li>
+          </ul>
+        </section>
+        <section id="ci/cd">
+          <h2>Continuous Integration and Continuous Deployment (CI/CD)</h2>
+          <p>
+            Our CI/CD pipeline is powered by GitHub Actions and is designed to
+            automatically build, test, and deploy our application whenever
+            changes are merged into the <code>main</code> branch. This process
+            ensures that the latest code is continuously delivered to our Azure
+            Kubernetes Service (AKS) cluster with minimal downtime.
+          </p>
+
+          <h3>Pipeline Overview</h3>
+          <p>
+            The pipeline is triggered on any push to the
+            <code>main</code> branch and performs the following steps:
+          </p>
+          <ol>
+            <li>
+              <strong>Source Code Checkout and Setup:</strong>
+              <br />
+              The pipeline begins by checking out the source code from our
+              repository using the <code>actions/checkout</code> action. For the
+              front-end application (a Single-Page Application), Node.js
+              (version 22) is set up using <code>actions/setup-node</code> to
+              facilitate the build process.
+            </li>
+            <li>
+              <strong>Docker Image Builds:</strong>
+              <br />
+              We build separate Docker images for each component of our
+              application:
+              <ul>
+                <li>
+                  <em>API:</em> Built from the <code>ELAN.Api</code> folder.
+                </li>
+                <li>
+                  <em>ESOLANG API:</em> Built from the
+                  <code>Elan.Api.Esolang</code> folder.
+                </li>
+                <li>
+                  <em>SITE (Front-End):</em> Built from the
+                  <code>FrontEnd</code> folder.
+                </li>
+              </ul>
+              The build commands use the respective Dockerfiles in these
+              directories as the build context, ensuring that all necessary
+              files are available during the build.
+            </li>
+            <li>
+              <strong>Secure Azure Authentication:</strong>
+              <br />
+              To interact with Azure, the pipeline logs in using Microsoft Entra
+              App registration. The sensitive credentials—including the client
+              ID, tenant ID, and subscription ID—are stored securely as GitHub
+              repository secrets. This secure method allows the pipeline to
+              authenticate with Azure without exposing credentials in the code.
+            </li>
+            <li>
+              <strong
+                >Azure Container Registry (ACR) Login and Image Push:</strong
+              >
+              <br />
+              After the images are built, the pipeline logs into our ACR using
+              the <code>docker/login-action</code>. The ACR username and
+              password are also stored as GitHub secrets. Once authenticated,
+              the new Docker images are pushed to the registry, ensuring that
+              the latest versions are available for deployment.
+            </li>
+            <li>
+              <strong>Deployment to AKS:</strong>
+              <br />
+              The pipeline then sets the context for our AKS cluster using the
+              <code>azure/aks-set-context</code> action—again, utilizing our
+              secure credentials. Finally, it applies the Kubernetes manifests
+              (located in the <code>devops/k8s</code> directory) using
+              <code>kubectl apply</code>. This updates our deployments,
+              services, and ingress configurations, triggering a rolling update
+              in AKS.
+            </li>
+          </ol>
+
+          <h3>Optimizations and Conditional Triggers</h3>
+          <p>
+            To avoid unnecessary builds, the pipeline can be configured to
+            trigger only when changes are made to relevant parts of the
+            repository (for example, the application source code or Kubernetes
+            manifests). This is accomplished using GitHub Actions’
+            <code>paths</code> filters.
+          </p>
+          <p>
+            Additionally, our Kubernetes Deployments are configured with rolling
+            update strategies and health checks, ensuring that new pods are
+            fully ready before old ones are terminated—thus minimizing any
+            potential downtime during deployment.
+          </p>
+
+          <h3>Summary</h3>
+          <p>In summary, our CI/CD pipeline leverages GitHub Actions to:</p>
+          <ul>
+            <li>
+              Securely connect to Azure using secrets and a Service Principal.
+            </li>
+            <li>
+              Build Docker images for multiple microservices and push them to
+              Azure Container Registry.
+            </li>
+            <li>
+              Deploy the updated images to our AKS cluster with zero or minimal
+              downtime using rolling updates.
+            </li>
+          </ul>
+          <p>
+            This fully automated process ensures that any changes merged into
+            the main branch are quickly and safely deployed, keeping our
+            production environment up-to-date while maintaining security and
+            efficiency.
+          </p>
+        </section>
+        <section id="funct-insight">
+          <h5>Key Functional Insights</h5>
+          <ul>
+            <li>
+              Microservices-based architecture: Different parts of the
+              application are deployed separately.
+            </li>
+            <li>
+              Scalability & High Availability: Using Azure Kubernetes Service
+              (AKS) allows for automatic scaling.
+            </li>
+            <li>
+              Secure Communication: TLS certificates are managed through Let's
+              Encrypt.
+            </li>
+            <li>
+              API Gateway via Ingress Controller: Efficient request routing and
+              traffic control.
+            </li>
+            <li>
+              CI/CD Ready: Pulling images from Azure Container Registry allows
+              easy updates and deployment automation.
+            </li>
+          </ul>
+        </section>
+      </section>
+      <section id="frontend-stuff">
+        <h3>Front-end</h3>
+        <p>
+          The frontend of the ELAN Web Application serves as the user interface
+          and interaction layer, allowing users to explore and analyze esoteric
+          programming languages efficiently. Built using TypeScript, React, and
+          Chakra UI, the frontend ensures a modern, responsive, and
+          user-friendly experience.
+        </p>
+        <p></p>
+        <section id="Structure">
+          <h5>Folder Structure</h5>
+          <ul>
+            <li>/assets</li>
+            <p>Static content like svg.</p>
+            <li>/components/ui</li>
+            <p>Chakra UI snippet components.</p>
+            <li>/shared</li>
+            <p>Footer, Navbar, utils.</p>
+            <li>App.tsx</li>
+            <p>The router of the app.</p>
+            <li>main.tsx</li>
+            <p>The root document of the app.</p>
+            <li>/entities</li>
+            <p>The types used for the REST responses.</p>
+            <li>/hooks</li>
+            <p>Custom hooks.</p>
+            <li>/elan-presentation</li>
+            <li>/home</li>
+            <li>/sparql</li>
+            <li>/sparql-entity</li>
+            <p>
+              The modules of the ELAN web app. Depending on their
+              functionalities/purpose they may have the following structure:
+            </p>
+            <ul>
+              <li>/cache</li>
+              <p>
+                React Query functions used for fetching and state management.
+              </p>
+              <li>/components</li>
+              <p>Module specific components used for separation of logic.</p>
+              <li>constant.ts</li>
+              <p>Static text.</p>
+              <li>page.tsx</li>
+              <p>The root of the module.</p>
+              <li>page.layout.tsx</li>
+              <p>UI specific elements.</p>
+            </ul>
+          </ul>
+        </section>
+        <section id="entities">
+          <h3>Entities</h3>
+          <p>
+            Definition of types for the API responses, which serve as data
+            models for structuring and validating the responses received from
+            the backend. These types help ensure type safety, maintainability,
+            and consistency across the application, particularly since we are
+            using TypeScript.
+          </p>
+          <section id="entity-data123">
+            <h5>EntityData</h5>
+            <img src="./Scholarly HTML_files/third.png" />
+            <p>
+              EntityData models an item/subject such as Brainfuck or its author
+              Urban Müller.
+            </p>
+          </section>
+          <section id="entitities-data123">
+            <h5>EntitiesData</h5>
+            <img src="./Scholarly HTML_files/fifth.png" />
+            <p>EntitiesData model a list of items/subjects.</p>
+          </section>
+          <section id="filter">
+            <h5>FiltersData</h5>
+            <img src="./Scholarly HTML_files/forth.png" />
+            <p>
+              The properties used for filtering. Since not all properties of an
+              item can be used for filterting, this type couldn't be done in a
+              dynamic way.
+            </p>
+            <p>The properties are split into two categories:</p>
+            <ul>
+              <li>Properties where the value matters, e.g, developer@en.</li>
+              <li>
+                Properties where the value does not matter but its presence
+                does, e.g, official website@en.
+              </li>
+            </ul>
+          </section>
+          <section id="sparql">
+            <h5>SPARQLResult</h5>
+            <img src="./Scholarly HTML_files/sixth.png" />
+            <p>
+              The results of a SPARQL query are represented as a table with rows
+              and columns.
+            </p>
+          </section>
+          <section id="graph">
+            <h5>Graph</h5>
+            <img src="./Scholarly HTML_files/seventh.png" />
+            <p>
+              The Graph entity is not used for an API response, but it is used
+              for the construction of the network. By iterating over
+              EntitiesData we construct the Graph.
+            </p>
+          </section>
+        </section>
+        <section id="fetching">
+          <h3>Fetching and state management</h3>
+          <p>
+            In the ELAN web application, data fetching and state management are
+            efficiently handled using React Query, Axios, useState, useEffect,
+            and custom hooks. This combination ensures optimized API
+            interactions, efficient caching, and improved performance while
+            providing a smooth user experience.
+          </p>
+          <img src="./Scholarly HTML_files/tenth.png" />
+          <p>
+            For example, elanguages.site/sparql, the query console page uses
+            useSessionStorage that makes sure that the query and response
+            remains stored on the user's session. Meaning that going from page
+            to page won't erase that data.
+          </p>
+          <img src="./Scholarly HTML_files/11.png" />
+          <p>
+            When sending a query from the console, if the API is still
+            processing the previous request, the client won't be able to
+            repeatedly send other queries.
+          </p>
+          <img src="./Scholarly HTML_files/12.png" />
+          <p>
+            Requests errors are handled depending on their type of error. When
+            sending a bad query a warning about its error will pop up.
+          </p>
+          <img src="./Scholarly HTML_files/13.png" />
+        </section>
+      </section>
+      <section id="backebd-stuff">
+        <h3>Back-end</h3>
+        <p>The project consists of two core microservices:</p>
+        <ul>
+          <li>
+            <strong>Elan.Api.Esolang:</strong> Handles queries related to
+            esoteric programming languages, leveraging SPARQL to fetch data from
+            external sources like Wikidata.
+          </li>
+          <li>
+            <strong>ELAN.Api:</strong> Similar in structure, it supports related
+            operations with a focus on RDF-based models and linked data
+            principles.
+          </li>
+        </ul>
+        <section id="anotherstuff">
+          <h4>SPARQL and RDF Integration</h4>
+          <p>
+            To effectively manage semantic data, the services integrate an RDF
+            library that facilitates SPARQL querying and RDF data manipulation.
+            The <code>SparqlRepository</code> uses this library to interface
+            with external RDF data sources such as Wikidata. The RDF library
+            ensures compatibility with linked data principles, enabling the
+            system to work with ontologies, taxonomies, and vocabularies.
+          </p>
+
+          <p>An example of a SPARQL query is shown below:</p>
+          <pre><code>public static string GetEntityDescription(string entityId) => @"
+          SELECT ?propertyLabel ?propertyDescription WHERE {
+              wd:{entityId} rdfs:label ?propertyLabel;
+                     schema:description ?propertyDescription.
+              FILTER(LANG(?propertyLabel) = 'en')
+              FILTER(LANG(?propertyDescription) = 'en')
+          }";</code></pre>
+
+          <p>
+            The integration with the RDF library allows for efficient query
+            execution and data retrieval. The
+            <code>ISparqlRepository</code> interface defines methods such as
+            <code>ExecuteQuery</code> to handle complex queries, ensuring that
+            semantic data can be queried, transformed, and cached according to
+            business needs.
+          </p>
+        </section>
+        <section id="brrr">
+          <h4>Design Patterns and Folder Structure</h4>
+          <p>
+            The microservices follow a clean architecture with the following
+            folder structure:
+          </p>
+          <ul>
+            <li>
+              <strong>Controllers:</strong> Define API endpoints (e.g.,
+              <code>EntityController.cs</code>).
+            </li>
+            <li>
+              <strong>Models:</strong> Represent data structures (e.g.,
+              <code>EntityDetails.cs</code>).
+            </li>
+            <li>
+              <strong>Repositories:</strong> Handle data access and querying
+              logic, such as the <code>SparqlRepository</code>.
+            </li>
+            <li>
+              <strong>Services:</strong> Contain business logic, including data
+              filtering and caching (e.g., <code>EsolangService.cs</code>).
+            </li>
+            <li><strong>Data:</strong> Stores models.</li>
+          </ul>
+          <p>
+            This organization promotes separation of concerns and scalability.
+          </p>
+        </section>
+        <section id="brrrr">
+          <h4>Service Initialization and Dependency Injection</h4>
+          <p>
+            The services are initialized with dependency injection in the
+            <code>Program.cs</code> file:
+          </p>
+          <pre><code>builder.Services.AddScoped&lt;ISparqlRepository, SparqlRepository&gt;();
+      builder.Services.AddScoped&lt;IWikidataService, WikidataService&gt;();
+      builder.Services.AddScoped&lt;EsolangService&gt;();</code></pre>
+          <p>
+            The <code>EsolangService</code> initializes cached data on startup
+            to enhance performance by avoiding repeated queries.
+          </p>
+        </section>
+        <section id="brrrrr">
+          <h4>Docker and AKS Integration</h4>
+          <p>
+            The project uses Docker for containerization and Azure Kubernetes
+            Service (AKS) for deployment. The Docker setup employs a multi-stage
+            build process:
+          </p>
+          <pre><code># Base stage for runtime
+      FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+      USER $APP_UID
+      WORKDIR /app
+      EXPOSE 8080
+      EXPOSE 8081
+      
+      # Build stage
+      FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+      ARG BUILD_CONFIGURATION=Release
+      WORKDIR /src
+      COPY ["Elan.Api.Esolang.csproj", "."]
+      RUN dotnet restore "./Elan.Api.Esolang.csproj"
+      COPY . .
+      RUN dotnet build "./Elan.Api.Esolang.csproj" -c $BUILD_CONFIGURATION -o /app/build
+      
+      # Publish stage
+      FROM build AS publish
+      RUN dotnet publish "./Elan.Api.Esolang.csproj" -c $BUILD_CONFIGURATION -o /app/publish
+      
+      # Final stage
+      FROM base AS final
+      WORKDIR /app
+      COPY --from=publish /app/publish .
+      ENTRYPOINT ["dotnet", "Elan.Api.Esolang.dll"]</code></pre>
+
+          <p>
+            To deploy on AKS, Kubernetes YAML files are used to define
+            deployment and service configurations:
+          </p>
+          <pre><code>apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: elan-esolang-api-deployment
+        labels:
+          app: elan-esolang-api
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: elan-esolang-api
+        template:
+          metadata:
+            labels:
+              app: elan-esolang-api
+          spec:
+            containers:
+              - name: elan-esolang-api
+                image: elanacr.azurecr.io/elan-esolang-api:latest
+                imagePullPolicy: Always
+                ports:
+                  - containerPort: 8080
+                env:
+                  - name: ASPNETCORE_ENVIRONMENT
+                    value: "Production"
+      
+      ---
+      
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: elan-esolang-api-service
+        labels:
+          app: elan-esolang-api
+      spec:
+        type: ClusterIP
+        selector:
+          app: elan-esolang-api
+        ports:
+          - port: 80
+            targetPort: 8080</code></pre>
+
+          <p>
+            The Kubernetes setup ensures scalability and high availability for
+            both microservices by leveraging container orchestration.
+          </p>
+        </section>
+        <section id="brrrrrrrr">
+          <h4>Conclusion</h4>
+          <p>
+            The backend services integrate SPARQL, RDF, and linked data
+            principles to provide robust, scalable access to semantic data.
+            Through a combination of Docker-based containerization and AKS
+            deployment, the system achieves maintainability, performance, and
+            cloud scalability.
+          </p>
+        </section>
+      </section>
+    </section>
+    <section id="API">
+      <h2>REST API</h2>
+      <p>
+        The ELAN system adopts a RESTful API architecture due to its simplicity,
+        scalability, and compatibility with caching mechanisms. The API serves
+        as the backbone of the application, facilitating interaction between the
+        frontend (React) and backend (.NET Core 8) while exposing endpoints for
+        querying esoteric programming languages and related tools.
+      </p>
+
+      <section id="sparql">
+        <h3>post - elan/api/Sparql</h3>
+        <p>
+          This endpoint allows users to execute SPARQL queries against the
+          Wikidata endpoint. It accepts a JSON object containing the SPARQL
+          query and returns structured results in a user-friendly format.
+        </p>
+      </section>
+      <section id="entity">
+        <h3>get - esolang/api/entity/${id}</h3>
+        <p>
+          This endpoint retrieves detailed information about a specific esolang
+          entity by its Wikidata ID.
+        </p>
+        <ul>
+          <li>
+            The WikidataService executes SPARQL queries to fetch entity details
+            from Wikidata.
+          </li>
+          <li>
+            The response is transformed into a structured format for easy
+            consumption by the frontend.
+          </li>
+          <li>
+            Links to Wikidata entities are modified to point to the ELAN
+            application for seamless navigation.
+          </li>
+        </ul>
+      </section>
+      <section id="entities">
+        <h3>get - esolang/api/Esolang/esolang-entities</h3>
+        <p>
+          This endpoint retrieves a list of all esoteric programming language
+          entities.
+        </p>
+        <ul>
+          <li>A SPARQL query retrieves all esolang entities from Wikidata.</li>
+          <li>
+            The results are filtered to exclude irrelevant properties and cached
+            for performance.
+          </li>
+          <li>
+            The response is structured to include only relevant information for
+            the frontend.
+          </li>
+        </ul>
+      </section>
+      <section id="filters">
+        <h3>get - esolang/api/Esolang/filters</h3>
+        <p>
+          This endpoint provides a list of filters and their possible values for
+          querying esolang entities.
+        </p>
+        <ul>
+          <li>
+            The endpoint aggregates filterable properties and their values from
+            the cached esolang entities.
+          </li>
+          <li>
+            Properties like official website@en are treated as boolean filters
+            (presence/absence).
+          </li>
+          <li>The response is cached to reduce redundant computation.</li>
+        </ul>
+      </section>
+      <section id="filtered-entities">
+        <h3>post - esolang/api/Esolang/filtered-esolang-entities</h3>
+        <p>
+          This endpoint retrieves esolang entities that match the specified
+          filters.
+        </p>
+        <ul>
+          <li>
+            The endpoint applies the filters to the cached list of esolang
+            entities.
+          </li>
+          <li>
+            For boolean filters (e.g., official website@en), it checks for the
+            presence of the property.
+          </li>
+          <li>
+            For value-based filters (e.g., developer), it matches the specified
+            values against entity properties.
+          </li>
+        </ul>
+      </section>
+      <section id="recommend-esolang-entities">
+        <h3>post - esolang/api/Esolang/recommend-esolang-entities</h3>
+        <p>
+          This endpoint recommends esolang entities based on partial matches to
+          the specified filters.
+        </p>
+      </section>
+      <section id="best-practic">
+        <h3>Best Practices</h3>
+        <p>
+          The REST API endpoints in the ELAN system adhere to several best
+          practices for designing, implementing, and maintaining robust and
+          scalable APIs. Below is a general overview of these best practices:
+        </p>
+      </section>
+      <p>RESTful Design Principles</p>
+      <ul>
+        <li>
+          Resource-Oriented: Each endpoint is designed around resources (e.g.,
+          esolang entities, filters) and uses HTTP methods (GET, POST)
+          appropriately to perform operations on these resources.
+        </li>
+        <li>
+          Statelessness: Each request contains all the information needed to
+          process it, ensuring the server does not maintain client state between
+          requests.
+        </li>
+      </ul>
+      <p>Caching for Performance Optimization</p>
+      <ul>
+        <li>
+          Responses for frequently accessed data (e.g., esolang entities and
+          filters) are cached to reduce redundant computation and improve
+          performance.
+        </li>
+        <li>
+          Caching is implemented using IMemoryCache in .NET, with a defined
+          expiration time (e.g., 1 day).
+        </li>
+      </ul>
+      <p>Separation of Concerns</p>
+      <ul>
+        <li>
+          The API is divided into controllers, services, and repositories, each
+          with a specific responsibility.
+        </li>
+        <li>
+          Services and repositories are injected into controllers, promoting
+          loose coupling and testability.
+        </li>
+      </ul>
+      <p>Flexibility and Extensibility</p>
+      <ul>
+        <li>
+          The use of microservices and containerization (e.g., Docker,
+          Kubernetes) allows the API to scale horizontally as demand grows.
+        </li>
+      </ul>
+    </section>
+    <section id="UseCases">
+      <h2>User guide</h2>
+      <p>
+        When accessing https://elanguages.site/ the user will be redirected to
+        https://elanguages.site/home where he will see the main page of the
+        application.
+      </p>
+      <img src="./Scholarly HTML_files/image.png" width="1200px" />
+      <p>
+        On the top right there are the 3 modules of the application: Home,
+        Presentation, SPARQL.
+      </p>
+      <p>
+        In the current page we can see a network of esoteric languages. All
+        esoteric languages (dark blue) are connected to the central node
+        EPL(light blue). Each esoteric language is connected to properties(light
+        green), and each property is connected to values(dark green) of said
+        property.
+      </p>
+      <img src="./Scholarly HTML_files/2.png" />
+      <p>
+        See Values button on the top left is used to hide the dark green values
+        in order to read the network easily.
+      </p>
+      <img src="./Scholarly HTML_files/3.png" />
+      <p>
+        The filters button will pop the filters by which the users can choose
+        his language. Here we can find 3 other button that the user can use for
+        resetting, filtering or to get recommendations about languages.
+      </p>
+      <p>
+        By left-clicking on a node it will take the users to the entity page of
+        the chosen entity or to the wikidata page of the chosen property.
+      </p>
+      <p>
+        For some quick filtering we added a right-click functionality. Once a
+        node gets right-clicked it will create a new network with all the roads
+        that have that node in common.
+      </p>
+      <p>
+        In the SPARQL module the user will be met with a query console. Based on
+        the user's query he will get information structured in a table like
+        manner.
+      </p>
+      <p>
+        For a more detailed user guide we recommend watching the demo:
+        <a href="https://www.youtube.com/watch?v=D8d8B8WtxgM" target="_blank"
+          >ELAN</a
+        >.
+      </p>
+    </section>
+  </body>
+</html>
